@@ -19,7 +19,7 @@ GhostFile is a **simple, temporary file upload server** that **automatically shu
 GhostFile requires **Python 3.7+** and Flask.
 
 ```bash
-git clone https://github.com/yourusername/ghostfile.git
+git clone https://github.com/jon6fingrs/ghostfile.git
 cd ghostfile
 pip install -r requirements.txt
 ```
@@ -56,15 +56,9 @@ By default, this:
 
 ## 🐳 Running with Docker
 
-### 🏗️ Building the Image
-
-```bash
-docker build -t thehelpfulidiot/ghostfile .
-```
-
 ### 🚀 Running the Server
 ```bash
-docker run --rm -t -v ./downloads:/app/downloads -p 5000:5000 thehelpfulidiot/ghostfile
+docker run --rm -t -v ./downloads:/app/downloads -p 5000:5000 thehelpfulidiot/ghostfile:latest
 ```
 
 ### 🔄 Explanation:

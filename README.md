@@ -69,6 +69,14 @@ docker run --rm -t -v ./downloads:/app/downloads -p 5000:5000 thehelpfulidiot/gh
 
 ---
 
+## 📸 Screenshot
+
+Here's a preview of GhostFile's simple web interface:
+
+![GhostFile Screenshot](https://github.com/jon6fingrs/ghostfile/raw/main/ghostfile_screenshot.png)
+
+---
+
 ## ⚠️ Purpose & Limitations
 
 GhostFile **is not** a persistent file upload service. It is meant for:

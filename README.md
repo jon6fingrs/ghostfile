@@ -94,9 +94,10 @@ Example output:
 Usage: ghostfile [OPTIONS]
 
 Options:
-  --dir TEXT      Specify a custom upload directory (default: ./downloads)
-  --port INTEGER  Specify a custom port (default: 5000)
-  --help          Show this message and exit.
+  --dir DIR       Specify a custom upload directory (default: ./downloads)
+  --host HOST     Host/IP to bind to (default: 0.0.0.0).
+  --port PORT     Specify a custom port (default: 5000)
+  -h, --help      Show this message and exit.
 ```
 ---
 

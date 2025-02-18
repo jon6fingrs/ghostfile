@@ -39,6 +39,7 @@ wget $(curl -s https://api.github.com/repos/jon6fingrs/ghostfile/releases/latest
 ```bash
 wget -O ghostfile $(curl -s https://api.github.com/repos/jon6fingrs/ghostfile/releases/latest | grep "browser_download_url" | grep "ghostfile-arm64" | cut -d '"' -f 4)
 ```
+This will automatically rename `ghostfile-arm64` to `ghostfile`. Downloading the file directly from the web will require you to rename it yourself or to adjust the subsequent commands.
 
 #### 3️⃣ **Make It Executable**
 ```bash

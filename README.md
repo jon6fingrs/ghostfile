@@ -209,6 +209,15 @@ _Note:_ Adjust the shared library paths as needed. For maximum compatibility, bu
     
 -   **Mode Override:**  `--gui true` forces GUI mode.
     
+----------
+
+## 📸 Screenshots
+
+### GUI Mode
+![Ghostfile GUI](screenshots/ghostfile-gui.png)
+
+### Web UI
+![Web UI](screenshots/webui.png)
 
 ----------
 

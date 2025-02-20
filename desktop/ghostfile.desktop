@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=GhostFile
+Comment=Creates a single use webserver to upload files.
+Exec=/usr/local/bin/ghostfile
+Icon=ghostfile
+Terminal=false
+Categories=Utility;Application;

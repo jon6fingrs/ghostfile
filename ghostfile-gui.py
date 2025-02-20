@@ -88,7 +88,7 @@ UPLOAD_DIR = None    # Will be set in CLI mode or via the GUI.
 @app.route("/")
 def serve_index():
     """Serve index.html from the script's directory."""
-    script_dir = os.path.dirname(__file__)
+    script_dir = os.path.dirname(os.path.abspath(__file__))
     return send_from_directory(script_dir, "index.html")
 
 @app.route("/upload", methods=["POST"])
@@ -156,10 +156,17 @@ def main():
     CLI entry point:
       Parse command-line arguments and run the ghostfile server.
     """
+    # Determine default upload directory based on where the script is run from.
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    working_dir = os.getcwd()
+    if script_dir == working_dir:
+        default_upload_dir = "downloads"
+    else:
+        default_upload_dir = "."
     parser = argparse.ArgumentParser(
         description="A Flask file uploader that stops after handling an upload."
     )
-    parser.add_argument("--dir", default="downloads",
+    parser.add_argument("--dir", default=default_upload_dir,
                         help="Directory to save uploaded files (default: %(default)s).")
     parser.add_argument("--host", default="0.0.0.0",
                         help="Host/IP to bind to (default: %(default)s).")
@@ -192,6 +199,7 @@ class GhostFileGUI:
         tk.Label(master, text="Upload Directory:").grid(row=0, column=0, sticky="e", padx=5, pady=5)
         self.dir_entry = tk.Entry(master, width=50)
         self.dir_entry.grid(row=0, column=1, padx=5, pady=5)
+        # GUI mode defaults to home directory.
         self.dir_entry.insert(0, os.path.expanduser("~"))
         self.dir_browse = tk.Button(master, text="Browse", command=self.browse_directory)
         self.dir_browse.grid(row=0, column=2, padx=5, pady=5)
@@ -225,7 +233,13 @@ class GhostFileGUI:
         self.server_thread = None
 
     def browse_directory(self):
-        dir_path = filedialog.askdirectory(title="Select Upload Directory")
+        # Determine initial directory: use current text if valid; otherwise, use home directory.
+        current_text = self.dir_entry.get().strip()
+        if os.path.isdir(current_text):
+            initial_dir = current_text
+        else:
+            initial_dir = os.path.expanduser("~")
+        dir_path = filedialog.askdirectory(title="Select Upload Directory", initialdir=initial_dir)
         if dir_path:
             self.dir_entry.delete(0, tk.END)
             self.dir_entry.insert(0, dir_path)
@@ -254,7 +268,6 @@ class GhostFileGUI:
 # -----------------------------------------------------------------------------
 if __name__ == "__main__":
     if "--gui" in sys.argv:
-        # Launch GUI mode if --gui flag is provided.
         sys.argv.remove("--gui")
         root = tk.Tk(className="GhostFileGUI")
         root.title("GhostFile GUI Wrapper")
@@ -262,7 +275,6 @@ if __name__ == "__main__":
         gui = GhostFileGUI(root)
         root.mainloop()
     else:
-        # No --gui flag provided. Use detected mode.
         if mode == "gui":
             root = tk.Tk(className="GhostFileGUI")
             root.title("GhostFile GUI Wrapper")
@@ -270,6 +282,4 @@ if __name__ == "__main__":
             gui = GhostFileGUI(root)
             root.mainloop()
         else:
-            # Run in CLI mode (with default options or as specified by CLI switches)
             main()
-

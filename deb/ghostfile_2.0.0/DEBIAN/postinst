@@ -1,0 +1,3 @@
+#!/bin/bash
+chmod +x /usr/local/bin/ghostfile
+gtk-update-icon-cache /usr/share/icons/hicolor

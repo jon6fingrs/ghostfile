@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=GhostFile
+Comment=Ephemeral File Upload Server
+Exec=/usr/local/bin/ghostfile
+Icon=ghostfile
+Terminal=false
+Categories=Utility;Network;
+StartupWMClass=ghostFileGUI

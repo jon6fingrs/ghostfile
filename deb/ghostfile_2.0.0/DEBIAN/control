@@ -1,0 +1,9 @@
+Package: GhostFile
+Version: 2.0.0
+Section: utils
+Priority: optional
+Architecture: amd64
+Depends: 
+Maintainer: thehelpfulidiot <admin@thehelpfulidiot.com>
+Description: GhostFile - Ephemeral File Upload Server
+ A standalone GUI and CLI tool for ephemeral file uploads.

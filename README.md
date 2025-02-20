@@ -70,7 +70,7 @@ sudo mv ghostfile /usr/bin/
 sudo mv ghostfile /usr/local/bin/
 ```
 
-Now, you can launch GhostFile from any terminal by typing `ghostfile` (for Intel) or `ghostboard` (for ARM64).
+Now, you can launch GhostFile from any terminal by typing `ghostfile`.
 
 ----------
 
@@ -177,6 +177,50 @@ pyinstaller --onefile --windowed \
 ```
 
 _Note:_ Adjust the shared library paths as needed. For maximum compatibility, build using Python 3.8 on an older distribution (e.g., Ubuntu 18.04 or CentOS 7).
+
+---
+
+## 🖥️ Adding a Desktop Entry (GNOME Desktop Integration)
+
+To add GhostFile to your GNOME application menu:
+
+### 1. Create a Desktop Entry File
+```bash
+sudo nano /usr/share/applications/ghostfile.desktop
+```
+
+### 2. Add the following content:
+```ini
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=GhostFile
+Comment=Ephemeral File Upload Server
+Exec=/usr/local/bin/ghostfile
+Icon=ghostfile #must copy an icon to the correct path, see below
+Terminal=false
+Categories=Utility;Network;Application;
+```
+
+### 3. Make the desktop entry executable:
+```bash
+sudo chmod +x /usr/share/applications/ghostfile.desktop
+```
+
+### 4. Update the desktop database:
+```bash
+sudo update-desktop-database
+```
+
+### 5. (Optional) Add an Icon:
+Place your icon next to the binary:
+```bash
+sudo mv ghostfile.png /usr/share/pixmaps/ghostfile.png
+```
+
+### 6. Launch from GNOME:
+- Search for **GhostFile** in your application launcher.
+- Right-click and select **"Add to Favorites"** to pin it to the dock.
 
 ----------
 

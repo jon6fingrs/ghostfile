@@ -30,7 +30,6 @@ sys.argv = [sys.argv[0]] + remaining_args
 
 # -----------------------------------------------------------------------------
 # Helper to determine the script (or binary) directory.
-# If running from a PyInstaller bundle, use sys.executable.
 # -----------------------------------------------------------------------------
 def get_script_dir():
     if getattr(sys, 'frozen', False):
@@ -271,6 +270,17 @@ class GhostFileGUI:
         self.server_thread.start()
         self.start_button.config(state=tk.DISABLED)
         self.stop_button.config(state=tk.NORMAL)
+        # Begin polling for server thread status.
+        self.check_server_status()
+
+    def check_server_status(self):
+        # If the server thread is no longer alive, update the buttons.
+        if self.server_thread is None or not self.server_thread.is_alive():
+            self.start_button.config(state=tk.NORMAL)
+            self.stop_button.config(state=tk.DISABLED)
+            print("Server stopped.", flush=True)
+        else:
+            self.master.after(500, self.check_server_status)
 
     def stop_server(self):
         global http_server

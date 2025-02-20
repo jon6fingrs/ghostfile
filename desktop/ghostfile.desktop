@@ -7,3 +7,4 @@ Exec=/usr/local/bin/ghostfile
 Icon=ghostfile #must copy an icon to the correct path, see readme
 Terminal=false
 Categories=Utility;Network;Application;
+StartupWMClass=Ghostfilegui

@@ -15,7 +15,7 @@ GhostFile is a lightweight, one-time file upload server that automatically shuts
         
     -   You may override the auto-detection with the flag: `--gui true` or `--gui false`.
         
--   **Asset Inclusion:** The web interface requires the accompanying `index.html` fiWM_CLASS(le, which is bundled with the binary.
+-   **Asset Inclusion:** The web interface requires the accompanying `index.html`, which is bundled with the binary.
     
 -   **Platform Compatibility:** Although GhostFile is likely compatible with Windows and macOS, it has only been tested on Linux.
     

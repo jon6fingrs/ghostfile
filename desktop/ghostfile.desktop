@@ -2,8 +2,8 @@
 Version=1.0
 Type=Application
 Name=GhostFile
-Comment=Creates a single use webserver to upload files.
+Comment=Ephemeral File Upload Server
 Exec=/usr/local/bin/ghostfile
-Icon=ghostfile
+Icon=ghostfile #must copy an icon to the correct path, see below
 Terminal=false
-Categories=Utility;Application;
+Categories=Utility;Network;Application;

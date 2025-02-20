@@ -5,7 +5,7 @@ FROM python:3.12-slim
 WORKDIR /app
 
 # Copy the application files into the container
-COPY upload_server.py index.html requirements.txt /app/
+COPY ghostfile-gui.py index.html requirements.txt /app/
 
 # Install dependencies in a virtual environment
 RUN python -m venv venv && \
@@ -16,4 +16,4 @@ RUN python -m venv venv && \
 EXPOSE 5000
 
 # Command to start the server
-CMD ["/app/venv/bin/python", "/app/upload_server.py"]
+CMD ["/app/venv/bin/python", "/app/ghostfile-gui.py"]

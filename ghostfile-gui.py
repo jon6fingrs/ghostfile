@@ -29,6 +29,16 @@ else:
 sys.argv = [sys.argv[0]] + remaining_args
 
 # -----------------------------------------------------------------------------
+# Helper to determine the script (or binary) directory.
+# If running from a PyInstaller bundle, use sys.executable.
+# -----------------------------------------------------------------------------
+def get_script_dir():
+    if getattr(sys, 'frozen', False):
+        return os.path.dirname(sys.executable)
+    else:
+        return os.path.dirname(os.path.abspath(__file__))
+
+# -----------------------------------------------------------------------------
 # GhostFile Server Code
 # -----------------------------------------------------------------------------
 
@@ -137,7 +147,10 @@ def run_server(host, port):
             print("[*] Accessible on the following LAN addresses:", flush=True)
             for ip in lan_ips:
                 print(f"    http://{ip}:{port}", flush=True)
-    http_server.serve_forever()
+    try:
+        http_server.serve_forever()
+    except KeyboardInterrupt:
+        pass
     print("[*] Server has shut down. Exiting...", flush=True)
 
 def start_ghostfile_server(host, port, upload_dir):
@@ -156,8 +169,7 @@ def main():
     CLI entry point:
       Parse command-line arguments and run the ghostfile server.
     """
-    # Determine default upload directory based on where the script is run from.
-    script_dir = os.path.dirname(os.path.abspath(__file__))
+    script_dir = get_script_dir()
     working_dir = os.getcwd()
     if script_dir == working_dir:
         default_upload_dir = "downloads"
@@ -173,7 +185,12 @@ def main():
     parser.add_argument("--port", default=5000, type=int,
                         help="Port to listen on (default: %(default)s).")
     args = parser.parse_args()
-    start_ghostfile_server(args.host, args.port, args.dir)
+    try:
+        start_ghostfile_server(args.host, args.port, args.dir)
+    except KeyboardInterrupt:
+        if http_server:
+            http_server.shutdown()
+        print("\n[*] Exiting...", flush=True)
 
 # -----------------------------------------------------------------------------
 # GUI Wrapper Code

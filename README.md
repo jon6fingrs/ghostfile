@@ -1,270 +1,122 @@
-
 # GhostFile: Ephemeral File Upload Server
 
-GhostFile is a lightweight, one-time file upload server that automatically shuts down after handling an upload. It’s designed for quick, ephemeral file transfers and is distributed as a single, self-contained binary. GhostFile can run in either command-line (CLI) mode or with a graphical user interface (GUI).
+GhostFile is a tiny one-shot upload server. Run it, open the page from another
+device, drop in one or more files, and GhostFile saves them and exits.
 
-## 💡 Important Notes:
+It's a single static binary (~6 MB, no dependencies) with the web page built in.
 
--   **Preferred Usage:** Running the binary is the recommended way to use GhostFile because it is self-contained and requires no additional dependencies.
-    
--   **Dual-Mode Operation:**
-    
-    -   **CLI Mode:** When launched from a terminal, GhostFile runs in CLI mode with all command-line options available.
-        
-    -   **GUI Mode:** When launched from a desktop environment (or forced with `--gui true`), a GUI appears with configuration fields and a live log window.
-        
-    -   You may override the auto-detection with the flag: `--gui true` or `--gui false`.
-        
--   **Asset Inclusion:** The web interface requires the accompanying `index.html`, which is bundled with the binary.
-    
--   **Platform Compatibility:** Although GhostFile is likely compatible with Windows and macOS, it has only been tested on Linux.
-    
--   **ARM64 Testing:** Binaries for both Intel (x86_64) and ARM64 have been built. ARM64 testing is limited – please report any issues.
-    
-
-----------
-
-## 📂 Download and Installation
-
-### Binary Distribution (Recommended)
-
-Download the pre-built binaries from our [dist folder](https://github.com/jon6fingrs/ghostfile/tree/main/dist).
-
-#### For Intel (x86_64):
-
-Download the Intel binary with `wget`:
-
-```
-wget -O ghostfile https://raw.githubusercontent.com/jon6fingrs/ghostfile/main/dist/ghostfile
-chmod +x ghostfile
-```
-
-#### For ARM64:
-
-Download the ARM64 binary and automatically rename it to `ghostfile`:
-
-```
-wget -O ghostfile https://raw.githubusercontent.com/jon6fingrs/ghostfile/main/dist/ghostfile-arm64
-chmod +x ghostfile
-```
-
-### Moving the Binary to Your PATH
-
-After downloading, move the binary to a directory in your PATH so you can run it from anywhere:
-
-#### Ubuntu/Debian:
-
-```
-sudo mv ghostfile /usr/local/bin/
-```
-
-#### Fedora:
-
-```
-sudo mv ghostfile /usr/bin/
-```
-
-#### Arch Linux:
-
-```
-sudo mv ghostfile /usr/local/bin/
-```
-
-Now, you can launch GhostFile from any terminal by typing `ghostfile`.
-
-----------
-
-## 🔌 How to Use GhostFile
-
-### Running the Binary
-
-#### From the Terminal (CLI Mode)
-
-When you run the binary from a terminal, it automatically detects the environment and defaults to CLI mode unless overridden:
-
-```
-ghostfile
-```
-
-**Default CLI Behavior:**
-
--   **Upload Directory:**
-    
-    -   If the binary is run from the same directory where it resides, it defaults to a subdirectory called `./downloads` (created automatically if needed).
-        
-    -   If run from another location, it defaults to the current working directory.
-        
--   **Host:**  `0.0.0.0` (all network interfaces)
-    
--   **Port:**  `5000`
-    
-
-**Overriding Mode:**
-
-Use `--gui false` to force CLI mode or specify other options:
-
-```
-ghostfile --dir /path/to/upload --host 127.0.0.1 --port 8080 --gui false
-```
-
-Pressing `Ctrl+C` in CLI mode will gracefully shut down the server.
-
-#### From a Desktop Environment (GUI Mode)
-
-If you launch the binary by double-clicking it or from a desktop launcher, no terminal is attached and GhostFile automatically starts in GUI mode (unless overridden with `--gui false`).
-
-In GUI mode, a window opens that allows you to:
-
--   Specify the upload directory (defaulting to your home directory; the directory selector will start from the current text field value or fall back to the home directory if invalid).
-    
--   Set the host (default: `0.0.0.0`) and port (default: `5000`).
-    
--   Start and stop the server.
-    
--   View live logging output.
-    
-
-To force GUI mode from the command line:
-
-```
-ghostfile --gui true
-```
-
-### Using the Python Script Directly
-
-If you prefer not to use the binary, you can run the Python script directly:
-
-```
-python3 ghostfile-gui.py [options]
-```
-
-This supports the same command-line options as described above.
-
-### Docker Option
-
-Docker is also supported. Note that Docker does **not** support GUI mode (only CLI mode is available).
-
-For example:
-
-```
-docker run --rm -it -v "$(pwd)":/src thehelpfulidiot/ghostfile [options]
-```
-
-Replace `[options]` with your desired command-line switches. The container logs will be output to Docker’s stdout.
-
-----------
-
-## 🏘️ Build Instructions
-
-GhostFile is built using PyInstaller to create a single self-contained binary.
-
-#### For Intel (x86_64):
-
-```
-pyinstaller --onefile --windowed \
-  --add-binary "/usr/lib/x86_64-linux-gnu/libpython3.8.so:." \
-  --add-data "index.html:." \
-  ghostfile-gui.py
-```
-
-#### For ARM64:
-
-```
-pyinstaller --onefile --windowed \
-  --add-binary "/usr/local/lib/libpython3.8.so.1.0:." \
-  --add-data "index.html:." \
-  ghostfile-gui.py
-```
-
-_Note:_ Adjust the shared library paths as needed. For maximum compatibility, build using Python 3.8 on an older distribution (e.g., Ubuntu 18.04 or CentOS 7).
-
----
-
-## 🖥️ Adding a Desktop Entry (GNOME Desktop Integration)
-
-To add GhostFile to your GNOME application menu:
-
-### 1. Create a Desktop Entry File
-```bash
-sudo nano /usr/share/applications/ghostfile.desktop
-```
-
-### 2. Add the following content:
-```ini
-[Desktop Entry]
-Version=1.0
-Type=Application
-Name=GhostFile
-Comment=Ephemeral File Upload Server
-Exec=/usr/local/bin/ghostfile
-Icon=ghostfile #must copy an icon to the correct path, see below
-Terminal=false
-Categories=Utility;Network;Application;
-StartupWMClass=Ghostfilegui
-```
-
-### 3. Make the desktop entry executable:
-```bash
-sudo chmod +x /usr/share/applications/ghostfile.desktop
-```
-
-### 4. Update the desktop database:
-```bash
-sudo update-desktop-database
-```
-
-### 5. (Optional) Add an Icon:
-Place your icon next to the binary:
-```bash
-sudo mv ghostfile.png /usr/share/pixmaps/ghostfile.png
-```
-
-### 6. Launch from GNOME:
-- Search for **GhostFile** in your application launcher.
-- Right-click and select **"Add to Favorites"** to pin it to the dock.
-
-----------
-
-## 🔎 Default Behavior Summary
-
-### CLI Mode:
-
--   **Upload Directory:**
-    
-    -   If run from the binary’s directory: defaults to `./downloads`.
-        
-    -   Otherwise: defaults to the current working directory.
-        
--   **Host:**  `0.0.0.0`
-    
--   **Port:**  `5000`
-    
--   **Mode Override:**  `--gui false` forces CLI mode.
-    
-
-### GUI Mode:
-
--   **Upload Directory:** Defaults to the user’s home directory.
-    
--   **Directory Selector:** Uses the current text field value as the starting point if valid.
-    
--   **Host:**  `0.0.0.0`
-    
--   **Port:**  `5000`
-    
--   **Mode Override:**  `--gui true` forces GUI mode.
-    
-----------
-
-## 📸 Screenshots
-
-### GUI Mode
-![Ghostfile GUI](screenshots/ghostfile-gui.png)
-
-### Web UI
 ![Web UI](screenshots/webui.png)
 
-----------
+## Install
 
+### Binary
 
-Enjoy using **GhostFile**! For feedback or contributions, please open an issue or submit a pull request.
+Grab a build from the [latest release](https://github.com/jon6fingrs/ghostfile/releases/latest):
+
+```sh
+# Linux x86_64 (use ghostfile-linux-arm64 for ARM)
+curl -Lo ghostfile https://github.com/jon6fingrs/ghostfile/releases/latest/download/ghostfile-linux-amd64
+chmod +x ghostfile
+sudo mv ghostfile /usr/local/bin/
+```
+
+macOS (`ghostfile-darwin-arm64` / `-amd64`) and Windows (`ghostfile-windows-amd64.exe`)
+builds are on the same page.
+
+### Debian / Ubuntu
+
+```sh
+curl -LO https://github.com/jon6fingrs/ghostfile/releases/latest/download/ghostfile_3.0.0_amd64.deb
+sudo apt install ./ghostfile_3.0.0_amd64.deb
+```
+
+This installs `/usr/bin/ghostfile` plus a desktop launcher. It upgrades the old
+2.x package in place.
+
+### Nix / NixOS
+
+Try it without installing:
+
+```sh
+nix run github:jon6fingrs/ghostfile -- --dir ~/Downloads
+```
+
+Declaratively, in your system flake:
+
+```nix
+{
+  inputs.ghostfile.url = "github:jon6fingrs/ghostfile";
+  inputs.ghostfile.inputs.nixpkgs.follows = "nixpkgs";
+
+  outputs = { nixpkgs, ghostfile, ... }: {
+    nixosConfigurations.myhost = nixpkgs.lib.nixosSystem {
+      modules = [
+        ghostfile.nixosModules.default
+        {
+          programs.ghostfile.enable = true;
+          programs.ghostfile.openFirewall = true; # opens TCP 5000
+        }
+      ];
+    };
+  };
+}
+```
+
+The flake also exports `packages.<system>.default` (for `environment.systemPackages`
+or home-manager's `home.packages`) and `overlays.default`, which adds `pkgs.ghostfile`.
+
+### Docker
+
+```sh
+docker build -t ghostfile .
+docker run --rm -it -p 5000:5000 -v "$(pwd)":/src ghostfile
+```
+
+Uploads land in the mounted directory.
+
+## Usage
+
+```
+ghostfile [--dir DIR] [--host HOST] [--port PORT] [--keep]
+```
+
+| Flag        | Default   | Description                                         |
+|-------------|-----------|-----------------------------------------------------|
+| `--dir`     | `.`       | Where to save uploads (created if missing)          |
+| `--host`    | `0.0.0.0` | Address to bind to                                  |
+| `--port`    | `5000`    | Port to listen on                                   |
+| `--keep`    | off       | Keep running after an upload instead of exiting     |
+| `--version` |           | Print the version                                   |
+
+On startup it prints the LAN URLs to open. After a successful upload it prints
+each saved path and exits with status 0, so it composes in scripts:
+
+```sh
+ghostfile --dir /tmp/incoming && ls /tmp/incoming
+```
+
+Notes:
+
+- Existing files are never overwritten. A duplicate name is saved as `name (1).ext`.
+- Submitting the form with no files doesn't stop the server.
+- `Ctrl+C` stops it cleanly.
+- There is no authentication. It's meant for trusted networks.
+
+## Build from source
+
+```sh
+go build -o ghostfile .        # or: nix build
+```
+
+Releases are built by GitHub Actions when a `v*` tag is pushed
+(`git tag v3.0.0 && git push origin v3.0.0`). The workflow cross-compiles every
+platform, builds the `.deb`s, and attaches them all to the release.
+
+## Changes in 3.0
+
+GhostFile was rewritten from Python/Flask/Tk to Go.
+
+- The Tk GUI window and `--gui` flag are gone. `--gui` is still accepted and
+  ignored, so old scripts don't break. The desktop launcher now opens in a terminal.
+- With no `--dir`, uploads go to the current directory. Version 2 used `./downloads`
+  when run from the binary's own directory.

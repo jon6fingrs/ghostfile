@@ -1,0 +1,51 @@
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - run: go vet ./... && go test ./...
+
+      - name: Build binaries and .debs
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          [[ "$GITHUB_REF_TYPE" == tag ]] || version="0.0.0~dev"
+          mkdir -p build
+          for target in linux/amd64 linux/arm64 darwin/amd64 darwin/arm64 windows/amd64; do
+            os=${target%/*} arch=${target#*/}
+            ext=""; [ "$os" = windows ] && ext=".exe"
+            out="build/ghostfile-$os-$arch$ext"
+            CGO_ENABLED=0 GOOS=$os GOARCH=$arch go build -trimpath \
+              -ldflags "-s -w -X main.version=$version" -o "$out" .
+            if [ "$os" = linux ]; then
+              packaging/build-deb.sh "$out" "$version" "$arch" build
+            fi
+          done
+          (cd build && sha256sum * > SHA256SUMS)
+          ls -la build
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ghostfile
+          path: build/*
+
+      - name: Publish release
+        if: github.ref_type == 'tag'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/*
+          generate_release_notes: true

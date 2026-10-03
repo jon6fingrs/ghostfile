@@ -19,32 +19,9 @@
         ghostfile = final.callPackage ./package.nix { inherit version; };
       };
 
-      nixosModules.default = { config, lib, pkgs, ... }:
-        let cfg = config.programs.ghostfile;
-        in {
-          options.programs.ghostfile = {
-            enable = lib.mkEnableOption "GhostFile";
-            package = lib.mkOption {
-              type = lib.types.package;
-              default = self.packages.${pkgs.stdenv.hostPlatform.system}.default;
-              description = "The ghostfile package to install.";
-            };
-            openFirewall = lib.mkOption {
-              type = lib.types.bool;
-              default = false;
-              description = "Open the TCP port GhostFile listens on.";
-            };
-            port = lib.mkOption {
-              type = lib.types.port;
-              default = 5000;
-              description = "Port to open in the firewall when openFirewall is set.";
-            };
-          };
-
-          config = lib.mkIf cfg.enable {
-            environment.systemPackages = [ cfg.package ];
-            networking.firewall.allowedTCPPorts = lib.mkIf cfg.openFirewall [ cfg.port ];
-          };
-        };
+      nixosModules.default = { pkgs, lib, ... }: {
+        imports = [ ./module.nix ];
+        programs.ghostfile.package = lib.mkDefault self.packages.${pkgs.stdenv.hostPlatform.system}.default;
+      };
     };
 }

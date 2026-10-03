@@ -62,6 +62,22 @@ Declaratively, in your system flake:
 }
 ```
 
+Without flakes, import the module directly in `configuration.nix`:
+
+```nix
+{
+  imports = [
+    "${builtins.fetchTarball "https://github.com/jon6fingrs/ghostfile/archive/main.tar.gz"}/module.nix"
+  ];
+
+  programs.ghostfile.enable = true;
+  programs.ghostfile.openFirewall = true; # opens TCP 5000
+}
+```
+
+To pin a version, use a tag URL (e.g. `.../archive/v3.0.0.tar.gz`) and add
+`sha256` from `nix-prefetch-url --unpack <url>`.
+
 The flake also exports `packages.<system>.default` (for `environment.systemPackages`
 or home-manager's `home.packages`) and `overlays.default`, which adds `pkgs.ghostfile`.
 

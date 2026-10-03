@@ -33,6 +33,8 @@ jobs:
               -ldflags "-s -w -X main.version=$version" -o "$out" .
             if [ "$os" = linux ]; then
               packaging/build-deb.sh "$out" "$version" "$arch" build
+              # Unversioned copy so releases/latest/download/ghostfile_<arch>.deb always works.
+              cp "build/ghostfile_${version}_${arch}.deb" "build/ghostfile_${arch}.deb"
             fi
           done
           (cd build && sha256sum * > SHA256SUMS)

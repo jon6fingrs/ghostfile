@@ -10,6 +10,7 @@ chmod 755 "$root"
 trap 'rm -rf "$root"' EXIT
 
 install -Dm755 "$bin" "$root/usr/bin/ghostfile"
+ln -s ghostfile "$root/usr/bin/ghostfile-send"
 install -Dm644 packaging/ghostfile.desktop "$root/usr/share/applications/ghostfile.desktop"
 install -Dm644 ghostfile.png "$root/usr/share/pixmaps/ghostfile.png"
 install -Dm644 LICENSE "$root/usr/share/doc/ghostfile/copyright"

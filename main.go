@@ -9,10 +9,13 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"mime"
+	"mime/multipart"
 	"net"
 	"net/http"
 	"os"
 	"os/signal"
+	"path"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -27,6 +30,17 @@ var version = "dev"
 var indexHTML string
 
 func main() {
+	if isSendInvocation() {
+		os.Exit(sendMain(os.Args[1:]))
+	}
+	if len(os.Args) > 1 && os.Args[1] == "send" {
+		os.Exit(sendMain(os.Args[2:]))
+	}
+
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "Usage:\n  ghostfile [flags]                  receive files\n  ghostfile send HOST[:PORT] PATH... send files (also: ghostfile-send)\n\nFlags:\n")
+		flag.PrintDefaults()
+	}
 	dir := flag.String("dir", ".", "directory to save uploaded files")
 	host := flag.String("host", "0.0.0.0", "host/IP to bind to")
 	port := flag.Int("port", 5000, "port to listen on")
@@ -152,8 +166,8 @@ func saveUploads(r *http.Request, dir string) ([]string, error) {
 		if err != nil {
 			return saved, err
 		}
-		name := filepath.Base(part.FileName())
-		if part.FormName() != "files" || name == "." || name == string(filepath.Separator) {
+		name := uploadName(part)
+		if part.FormName() != "files" || name == "" {
 			part.Close()
 			continue
 		}
@@ -166,7 +180,34 @@ func saveUploads(r *http.Request, dir string) ([]string, error) {
 	}
 }
 
+// uploadName returns the part's filename as a cleaned relative path. Relative
+// paths (e.g. "photos/a.jpg" from ghostfile send) are kept as long as they stay
+// inside the upload directory; anything else is reduced to its base name.
+// Returns "" if there is no usable name.
+func uploadName(part *multipart.Part) string {
+	// part.FileName() strips directories, so read the raw header instead.
+	_, params, err := mime.ParseMediaType(part.Header.Get("Content-Disposition"))
+	if err != nil {
+		return ""
+	}
+	name := strings.ReplaceAll(params["filename"], "\\", "/")
+	if name == "" {
+		return ""
+	}
+	name = path.Clean(strings.TrimLeft(name, "/"))
+	if !filepath.IsLocal(filepath.FromSlash(name)) {
+		name = path.Base(name)
+	}
+	if name == "." || name == ".." || name == "/" {
+		return ""
+	}
+	return filepath.FromSlash(name)
+}
+
 func saveFile(src io.Reader, dir, name string) (string, error) {
+	if err := os.MkdirAll(filepath.Join(dir, filepath.Dir(name)), 0o755); err != nil {
+		return "", err
+	}
 	f, path, err := createUnique(dir, name)
 	if err != nil {
 		return "", err

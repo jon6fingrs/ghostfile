@@ -1,4 +1,4 @@
-{ lib, buildGoModule, version ? "3.0.0" }:
+{ lib, buildGoModule, version ? "3.1.0" }:
 
 buildGoModule {
   pname = "ghostfile";
@@ -10,6 +10,7 @@ buildGoModule {
       ./go.mod
       ./main.go
       ./main_test.go
+      ./send.go
       ./index.html
       ./ghostfile.png
       ./packaging/ghostfile.desktop
@@ -22,6 +23,7 @@ buildGoModule {
   ldflags = [ "-s" "-w" "-X main.version=${version}" ];
 
   postInstall = ''
+    ln -s ghostfile $out/bin/ghostfile-send
     install -Dm644 packaging/ghostfile.desktop $out/share/applications/ghostfile.desktop
     install -Dm644 ghostfile.png $out/share/pixmaps/ghostfile.png
   '';

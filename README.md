@@ -26,11 +26,11 @@ builds are on the same page.
 ### Debian / Ubuntu
 
 ```sh
-curl -LO https://github.com/jon6fingrs/ghostfile/releases/latest/download/ghostfile_3.0.0_amd64.deb
-sudo apt install ./ghostfile_3.0.0_amd64.deb
+curl -LO https://github.com/jon6fingrs/ghostfile/releases/latest/download/ghostfile_amd64.deb
+sudo apt install ./ghostfile_amd64.deb
 ```
 
-This installs `/usr/bin/ghostfile` plus a desktop launcher. It upgrades the old
+This installs `/usr/bin/ghostfile`, `/usr/bin/ghostfile-send` and a desktop launcher. It upgrades the old
 2.x package in place.
 
 ### Nix / NixOS
@@ -92,6 +92,8 @@ Uploads land in the mounted directory.
 
 ## Usage
 
+### Receiving
+
 ```
 ghostfile [--dir DIR] [--host HOST] [--port PORT] [--keep]
 ```
@@ -111,7 +113,28 @@ each saved path and exits with status 0, so it composes in scripts:
 ghostfile --dir /tmp/incoming && ls /tmp/incoming
 ```
 
-Notes:
+### Sending from the command line
+
+From another machine with ghostfile installed:
+
+```sh
+ghostfile-send 192.168.1.20 report.pdf            # port defaults to 5000
+ghostfile-send 192.168.1.20:8080 photos/ notes.txt
+```
+
+`ghostfile-send` is the same binary under another name. `ghostfile send ...` does
+the same thing, which is the form to use on Windows. All files go in a single
+upload, so the receiver saves them and exits as usual, or stays up with `--keep`.
+Directories are sent recursively and keep their structure, so `photos/` arrives
+as `DIR/photos/...`.
+
+No ghostfile on the sending machine? Use `curl`:
+
+```sh
+curl -F files=@report.pdf -F files=@notes.txt http://192.168.1.20:5000/upload
+```
+
+### Notes
 
 - Existing files are never overwritten. A duplicate name is saved as `name (1).ext`.
 - Submitting the form with no files doesn't stop the server.
@@ -125,7 +148,7 @@ go build -o ghostfile .        # or: nix build
 ```
 
 Releases are built by GitHub Actions when a `v*` tag is pushed
-(`git tag v3.0.0 && git push origin v3.0.0`). The workflow cross-compiles every
+(`git tag v3.1.0 && git push origin v3.1.0`). The workflow cross-compiles every
 platform, builds the `.deb`s, and attaches them all to the release.
 
 ## Changes in 3.0
